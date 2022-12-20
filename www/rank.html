@@ -1,0 +1,94 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+    <meta http-equiv="Content-Security-Policy" content="default-src * data: gap: https://ssl.gstatic.com; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'">
+    <script src="components/loader.js"></script>
+  <script src="lib/onsenui/js/onsenui.min.js"></script>
+
+  <link rel="stylesheet" href="components/loader.css">
+  <link rel="stylesheet" href="lib/onsenui/css/onsenui.css">
+  <link rel="stylesheet" href="lib/onsenui/css/onsen-css-components.css">
+  <link rel="stylesheet" href="css/style.css">
+    <script>
+        ons.ready(function() {
+          console.log("rank Onsen UI is ready!");
+        });
+
+        if (ons.platform.isIPhoneX()) {
+          document.documentElement.setAttribute('onsflag-iphonex-portrait', '');
+          document.documentElement.setAttribute('onsflag-iphonex-landscape', '');
+        }
+    </script>
+</head>
+<body>
+    <!-- TODO: Please edit here -->
+
+    <ons-modal direction="up">
+      <div style="text-align: center">
+        <p>
+          <ons-icon icon="md-spinner" size="28px" spin></ons-icon> Loading...
+        </p>
+      </div>
+    </ons-modal>
+    
+    
+      <div class="def">
+        <div id="Ranking">
+          <ons-list id="list">
+          </ons-list>
+        </div>
+        <p id="Rank_HighPt"></p>
+        <a href="index.html"><ons-button id="backBtn">戻る</ons-button></a>
+      </div>
+    
+    <script>
+      document.querySelector('ons-modal').show();
+      //API関連---
+      const appKey = "8d09ae57c7da2cff6b7bb96288152d074be84517931d82f71352f4f709a5c798";
+      const cliantKey = "bb363961ae59cda7e17e318033e2b8ea547efd6024f2a2950aa0c5c6a664b530";
+      const Ranking = new NCMB(appKey,cliantKey);
+      //-----------
+      var RankDataClass = Ranking.DataStore("Ranking");
+
+      var ranknum = 1;
+
+      if(localStorage.getItem("HighPt") != null){
+        document.getElementById("Rank_HighPt").innerHTML = "登録ハイスコア：" + localStorage.getItem("HighPt") + "Pt";
+      }
+
+      RankDataClass
+      .order("Point",true)
+      .count()
+      .fetchAll()
+      .then(function(results){
+        if(results.count == 0){
+          document.getElementById("list").innerHTML = "<ons-list-item modifier=\"longdivider\">データがありません</ons-list-item>";
+        }else{
+          for(var i = 0; i < results.count; i++){
+            if(i < 100){//上位100位まで
+              var DelayAniClass = "class=\"anime1 delay" + i + "\"";
+            }else{
+              DelayAniClass = "";
+            }
+            document.getElementById("list").innerHTML = document.getElementById("list").innerHTML + "<ons-list-item " + DelayAniClass + " modifier=\"longdivider\"><span class=\"list_rank\">" + ranknum + "位</span><span class=\"list_name\">" + results[i].Username + "</span><span class=\"list_sc\">" + results[i].Score + "問</span><span class=\"list_pt\">" + results[i].Point + "Pt</span></ons-list-item>";
+            if(i+1 < results.count){//同位の時の処理
+              if(results[i].Point != results[i+1].Point){
+                ranknum = ranknum + 1;
+              }
+            }
+          }
+        }
+        document.querySelector('ons-modal').hide();
+        // [{"objectId":"x1AyG95x0IxtzY7C","createDate":"2021-11-26T09:09:44.935Z","updateDate":"2021-11-26T09:09:44.963Z","acl":{"*":{"read":true,"write":true}},"Username":"てすた","Score":"15","Point":2393},{"objectId":"7jhDXLNII1K2LMEN","createDate":"2021-11-25T15:34:09.173Z","updateDate":"2021-11-25T15:34:09.174Z","acl":{"*":{"read":true,"write":true}},"Username":"てすた","Score":"10","Point":1825},{"objectId":"Bx5JxRDURl2e08ca","createDate":"2021-11-25T16:31:08.881Z","updateDate":"2021-11-25T16:31:08.882Z","acl":{"*":{"read":true,"write":true}},"Username":"てすた","Score":"9","Point":1577}]
+        
+      })
+      .catch(function(err){
+        alert("データ取得に失敗しました");
+        document.getElementById("list").innerHTML = "<ons-list-item modifier=\"longdivider\">データがありません</ons-list-item>";
+        document.querySelector('ons-modal').hide();
+      });
+    </script>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta http-equiv="Content-Security-Policy" content="default-src * data: gap: https://ssl.gstatic.com; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'">
+  <script src="components/loader.js"></script>
+  <script src="lib/onsenui/js/onsenui.min.js"></script>
+
+  <link rel="stylesheet" href="components/loader.css">
+  <link rel="stylesheet" href="lib/onsenui/css/onsenui.css">
+  <link rel="stylesheet" href="lib/onsenui/css/onsen-css-components.css">
+  <link rel="stylesheet" href="css/style.css">
+
+  <script>
+    ons.ready(function() {
+      console.log("index Onsen UI is ready!");
+    });
+
+    if (ons.platform.isIPhoneX()) {
+      document.documentElement.setAttribute('onsflag-iphonex-portrait', '');
+      document.documentElement.setAttribute('onsflag-iphonex-landscape', '');
+    }
+  </script>
+</head>
+<body>
+  <h1 id="title">Multipli Attack</h1>
+  <div id="description">
+    出題されるかけ算の問題の答えを<br />
+    4つの選択肢から選んで解答しよう<br />
+    早く答えるほどポイントが高くつくぞ<br />
+    スペシャル問題はタイムボーナス2倍！<br />
+    「たかがかけ算」と油断は禁物
+  </div>
+  <div class="def" id="Top">
+    <a href="game.html"><ons-button class="TopButton anime4 delay1" modifier="large"">スタート</ons-button></a>
+    <a href="rank.html"><ons-button class="TopButton anime4 delay2" modifier="large"">ランキング</ons-button></a>
+    <a href="setting.html"><ons-button class="TopButton anime4 delay3" modifier="large">設定</ons-button></a>
+  </div>
+</body>
+</html>
+
+<!-- 
+  To do
+  ・//不正解の選択肢が正解と同じ答えにならないための例外処理
+  ・//不正解選択肢生成AIを賢くする(ミスリードさせるような選択肢)
+  ・//「設定」を開いた時に前回の設定値をスイッチ等に適用する
+  Want to do
+  ・//スペシャル問題の追加
+  ・//「ランキング」画面のデザイン
+  ・//「結果」画面のデザイン
+  ・効果音
+  ・//不正解の時にバイブレーション
+  ・ランキング登録時に自分の順位を表示する
+  ・「ランキング」で記録を一人一つまでに(現状だと優秀者が同名で上位を占領することが考えられる)
+  ・「game.html」の選択肢をどうにかする
+  Bugs
+  ・//一部画面で上下のどちらかの背景が切れる？(viewport-fit=coverで解決)
+  ・「結果」画面で名前を入力し終わった後に画面が上にずれる
+ -->

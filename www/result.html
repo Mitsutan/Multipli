@@ -1,0 +1,81 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+    <meta http-equiv="Content-Security-Policy" content="default-src * data: gap: https://ssl.gstatic.com; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'">
+    <script src="components/loader.js"></script>
+    <script src="lib/onsenui/js/onsenui.min.js"></script>
+
+    <link rel="stylesheet" href="components/loader.css">
+    <link rel="stylesheet" href="lib/onsenui/css/onsenui.css">
+    <link rel="stylesheet" href="lib/onsenui/css/onsen-css-components.css">
+    <link rel="stylesheet" href="css/style.css">
+    
+</head>
+<body>
+  <div class="def">
+    <h1 id="title">結果</h1>
+    <p class="anime2 delay5">正解数：<span id="ResultCorrect"></span>　x　100Pt</p>
+    <!--<p>不正解数：<span id="ResultWrong"></span></p>-->
+    <p class="anime2 delay15">タイムボーナス：<span id="ResultBonus"></span>Pt</p>
+    <p class="anime2 delay25">合計ポイント：<span id="TotalPt"></span>Pt</p>
+    <p><b><span class="anime3 delay35" id="HighPt"></span></b></p>
+    <ons-input id="username" modifier="underbar" placeholder="名前を入力" maxlength="5"></ons-input>
+    <ons-button id="RankRegiBtn" onclick="RankRegister()">ランキング登録</ons-button>
+
+    <!-- <div id="Twitter"><a href="https://twitter.com/share?ref_src=twsrc%5Etfw" class="twitter-share-button" data-text="hi! ithink htat" data-hashtags="MultipliAttack" data-lang="ja" data-show-count="false">Tweet</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script></div> -->
+
+    <span id="next"><a href="index.html"><ons-button id="nextBtn">次へ</ons-button></a></span>
+  </div>
+
+  <script>
+      //
+      document.getElementById("username").value = localStorage.getItem("UserName");
+      document.getElementById("ResultCorrect").innerHTML = localStorage.getItem("Result_CorrectNum");
+      //document.getElementById("ResultWrong").innerHTML = localStorage.getItem("Result_WrongNum");
+      document.getElementById("ResultBonus").innerHTML = localStorage.getItem("Result_TimeBonus");
+      document.getElementById("TotalPt").innerHTML = parseInt(localStorage.getItem("Result_CorrectNum"))*100 + parseInt(localStorage.getItem("Result_TimeBonus"));
+
+      if(document.getElementById("TotalPt").innerHTML > parseInt(localStorage.getItem("HighPt")) || localStorage.getItem("HighPt") == null){
+        document.getElementById("HighPt").innerHTML = "登録ハイスコア更新！";
+      }
+
+      //API関連---
+      const appKey = "8d09ae57c7da2cff6b7bb96288152d074be84517931d82f71352f4f709a5c798";
+      const cliantKey = "bb363961ae59cda7e17e318033e2b8ea547efd6024f2a2950aa0c5c6a664b530";
+      const Ranking = new NCMB(appKey,cliantKey);
+      //-----------
+
+      function RankRegister(){
+        document.getElementById("RankRegiBtn").disabled = true;
+        document.getElementById("nextBtn").disabled = true;
+        localStorage.setItem("UserName",document.getElementById("username").value);
+        if(document.getElementById("TotalPt").innerHTML > parseInt(localStorage.getItem("HighPt")) || localStorage.getItem("HighPt") == null){
+          localStorage.setItem("HighPt",document.getElementById("TotalPt").innerHTML);
+        }
+        
+        //alert(document.getElementById("username").value+localStorage.getItem("Result_CorrectNum"));
+        var RankData = Ranking.DataStore("Ranking");
+        var RankDataClass = new RankData();
+
+        RankDataClass
+        .set("Username",document.getElementById("username").value)
+        .set("Score",localStorage.getItem("Result_CorrectNum"))
+        .set("Point",parseInt(localStorage.getItem("Result_TimeBonus")) + parseInt(localStorage.getItem("Result_CorrectNum"))*100)
+        .save()
+        .then(function(object){
+          alert("登録されました");
+          document.getElementById("nextBtn").disabled = false;
+        })
+        .catch(function(error){
+          alert("登録に失敗しました");
+          console.log(JSON.stringify(error));
+          document.getElementById("RankRegiBtn").disabled = false;
+          document.getElementById("nextBtn").disabled = false;
+        });
+      }
+      
+  </script>
+</body>
+</html>

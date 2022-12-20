@@ -1,0 +1,51 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+    <meta http-equiv="Content-Security-Policy" content="default-src * data: gap: https://ssl.gstatic.com; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'">
+    <script src="components/loader.js"></script>
+    <script src="lib/onsenui/js/onsenui.min.js"></script>
+
+    <link rel="stylesheet" href="components/loader.css">
+    <link rel="stylesheet" href="lib/onsenui/css/onsenui.css">
+    <link rel="stylesheet" href="lib/onsenui/css/onsen-css-components.css">
+    <link rel="stylesheet" href="css/style.css">
+    
+</head>
+<body>
+    <!-- TODO: Please edit here -->
+    <div class="def">
+      <p>本番モード<ons-switch class="Selecter" id="ModeSelecter"></ons-switch></p>
+      <!-- <p>本番モード<input type="checkbox" class="Selecter" id="ModeSelecter"></input></p> -->
+      <p>バイブレーション<ons-switch class="Selecter" id="VibSelecter"></ons-switch></p>
+      <p id="info">
+        <br />
+        Version 1.0.0<br />
+        2021/12 T.H<br />
+        Thank you for playing.
+      </p>
+      <a href="index.html"><ons-button id="backBtn" onclick="SaveSettings()">戻る</ons-button></a>
+    </div>
+
+    <script>
+      if(localStorage.getItem("ModeSetting") == "true"){
+        document.getElementById("ModeSelecter").checked = true;
+      }else{
+        document.getElementById("ModeSelecter").checked = false;
+      }
+
+      if(localStorage.getItem("VibSetting") == "true"){
+        document.getElementById("VibSelecter").checked = true;
+      }else{
+        document.getElementById("VibSelecter").checked = false;
+      }
+
+      function SaveSettings() {
+        //alert(document.getElementById("ModeSelecter").checked);
+        localStorage.setItem("ModeSetting",document.getElementById("ModeSelecter").checked);
+        localStorage.setItem("VibSetting",document.getElementById("VibSelecter").checked);
+      }
+    </script>
+</body>
+</html>
