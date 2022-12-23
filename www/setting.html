@@ -19,6 +19,7 @@
       <p>本番モード<ons-switch class="Selecter" id="ModeSelecter"></ons-switch></p>
       <!-- <p>本番モード<input type="checkbox" class="Selecter" id="ModeSelecter"></input></p> -->
       <p>バイブレーション<ons-switch class="Selecter" id="VibSelecter"></ons-switch></p>
+      <p>効果音<ons-switch class="Selecter" id="SeSelecter"></ons-switch></p>
       <p id="info">
         <br />
         Version 1.0.0<br />
@@ -41,10 +42,17 @@
         document.getElementById("VibSelecter").checked = false;
       }
 
+      if(localStorage.getItem("SeSetting") == "true"){
+        document.getElementById("SeSelecter").checked = true;
+      }else{
+        document.getElementById("SeSelecter").checked = false;
+      }
+
       function SaveSettings() {
         //alert(document.getElementById("ModeSelecter").checked);
         localStorage.setItem("ModeSetting",document.getElementById("ModeSelecter").checked);
         localStorage.setItem("VibSetting",document.getElementById("VibSelecter").checked);
+        localStorage.setItem("SeSetting",document.getElementById("SeSelecter").checked);
       }
     </script>
 </body>

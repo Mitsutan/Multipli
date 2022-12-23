@@ -1,5 +1,6 @@
 <!DOCTYPE HTML>
 <html>
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
@@ -13,16 +14,27 @@
     <link rel="stylesheet" href="css/style.css">
 
     <script>
-      ons.ready(function() {
-        console.log("game Onsen UI is ready!");
-      });
+        ons.ready(function() {
+            console.log("game Onsen UI is ready!");
+        });
 
-      if (ons.platform.isIPhoneX()) {
-        document.documentElement.setAttribute('onsflag-iphonex-portrait', '');
-        document.documentElement.setAttribute('onsflag-iphonex-landscape', '');
-      }
+        if (ons.platform.isIPhoneX()) {
+            document.documentElement.setAttribute('onsflag-iphonex-portrait', '');
+            document.documentElement.setAttribute('onsflag-iphonex-landscape', '');
+        }
+        const audios = {
+            "ok": new Audio("ok.mp3"),
+            "no": new Audio("no.mp3")
+        };
+        window.addEventListener('load', function() {
+            for (let i in audios) {
+                audios[i].load();
+                if(localStorage.getItem("SeSetting") == "false") audios[i].muted = true;
+                console.log(audios[i].muted);
+            }
+        });
     </script>
-    
+
     <template id="alert-dialog.html">
       <ons-alert-dialog id="my-alert-dialog" modifier="rowfooter">
         <div class="alert-dialog-title">準備はいい？</div>
@@ -45,222 +57,337 @@
       </ons-alert-dialog>
     </template>
 </head>
-<body>
-    <div class="def">
-      <ons-card>
-        <div class="title">
-          <div id="formula">　</div>
-        </div>
-        <div class="content">
-          <p>正解数：<span id="correctnum">0</span><span id="Special"></span></p>
-          <ons-progress-bar id="TimePrg" value="100"></ons-progress-bar>
-        </div>
-      </ons-card>
 
-      <ons-button class="selection" id="0" value="0" onclick="judge(0)" modifier="large">　</ons-button>
-      <ons-button class="selection" id="1" value="1" onclick="judge(1)" modifier="large">　</ons-button>
-      <ons-button class="selection" id="2" value="2" onclick="judge(2)" modifier="large">　</ons-button>
-      <ons-button class="selection" id="3" value="3" onclick="judge(3)" modifier="large">　</ons-button>
-      <span id="back"></span>
-      <span id="next"></span>
+<body>
+    <!-- <audio src="ok.mp3" id="ok"></audio> -->
+    <!-- <audio src="no.mp3" id="no"></audio> -->
+    <div class="def">
+        <ons-card>
+            <div class="title">
+                <div id="formula">　</div>
+            </div>
+            <div class="content">
+                <p>正解数：<span id="correctnum">0</span><span id="Special"></span></p>
+                <ons-progress-bar id="TimePrg" value="100"></ons-progress-bar>
+            </div>
+        </ons-card>
+
+        <ons-button class="selection" id="0" value="0" onclick="judge(0)" modifier="large">　</ons-button>
+        <ons-button class="selection" id="1" value="1" onclick="judge(1)" modifier="large">　</ons-button>
+        <ons-button class="selection" id="2" value="2" onclick="judge(2)" modifier="large">　</ons-button>
+        <ons-button class="selection" id="3" value="3" onclick="judge(3)" modifier="large">　</ons-button>
+        <span id="back"></span>
+        <span id="next"></span>
     </div>
 
     <script>
         //グローバル変数宣言
-        var CorrectSel = -1;//正解の選択肢を代入
-        var CorrectNum = 0;//正解数
-        var WrongNum = 0;//不正解数(未使用)
-        var TimeBonus = 0;//タイムボーナス
-        var timer;//タイマー用
-        var SpecialBonus = 1;//スペシャル問題ボーナス倍率初期値
-        
+        var CorrectSel = -1; //正解の選択肢を代入
+        var CorrectNum = 0; //正解数
+        var WrongNum = 0; //不正解数(未使用)
+        var TimeBonus = 0; //タイムボーナス
+        var timer; //タイマー用
+        var SpecialBonus = 1; //スペシャル問題ボーナス倍率初期値
 
-        
+
+
         //onsenUIのやつ----
         var hideAlertDialog = function() {
-          document.getElementById('my-alert-dialog').hide();
-          CorrectSel = GenerateMultipl();
-          //StartTimer();
-          //console.log(CorrectSel);
+            document.getElementById('my-alert-dialog').hide();
+            CorrectSel = GenerateMultipl();
+            //StartTimer();
+            //console.log(CorrectSel);
         };
 
         var createAlertDialog = function() {
-          var dialog = document.getElementById('my-alert-dialog');
+            var dialog = document.getElementById('my-alert-dialog');
 
-          if (dialog) {
-            dialog.show();
-          } else {
-            ons.createElement('alert-dialog.html', { append: true })
-              .then(function(dialog) {
+            if (dialog) {
                 dialog.show();
-              });
-          }
+            } else {
+                ons.createElement('alert-dialog.html', {
+                        append: true
+                    })
+                    .then(function(dialog) {
+                        dialog.show();
+                    });
+            }
         };
         //--------
 
-        
 
-        function GenerateMultipl(){
-          var formula = document.getElementById("formula");
 
-          var select = [4];
+        function GenerateMultipl() {
+            var formula = document.getElementById("formula");
 
-          var select1 = document.getElementById("0");
-          var select2 = document.getElementById("1");
-          var select3 = document.getElementById("2");
-          var select4 = document.getElementById("3");
+            var select = [4];
 
-          var correct = Math.floor( Math.random() * 4 );
+            var select1 = document.getElementById("0");
+            var select2 = document.getElementById("1");
+            var select3 = document.getElementById("2");
+            var select4 = document.getElementById("3");
 
-          var num1 = Math.floor( Math.random() * 101 );
-          var num2 = Math.floor( Math.random() * 101 );
-          var num3 = num1 * num2;
+            var correct = Math.floor(Math.random() * 4);
 
-          var rannum = -1;
+            var num1 = Math.floor(Math.random() * 101);
+            var num2 = Math.floor(Math.random() * 101);
+            var num3 = num1 * num2;
 
-          var miss = false;
-          
-          formula.innerHTML = num1 + " × " + num2 + " = ";
+            var rannum = -1;
 
-          if(Math.floor( Math.random() * 20) == 0){
-            SpecialBonus = 2;
-            document.getElementById("Special").innerHTML = " スペシャル問題";
-            num3 = GenerateSpecial(num1,num2);
-          }else{
-            SpecialBonus = 1;
-            document.getElementById("Special").innerHTML = "";
-          }
+            var miss = false;
 
-          for(var i = 0; i <= 3; i++){
-            if(i == correct){
-              select[i] = num3;
+            formula.innerHTML = num1 + " × " + num2 + " = ";
+
+            if (Math.floor(Math.random() * 20) == 0) {
+                SpecialBonus = 2;
+                document.getElementById("Special").innerHTML = " スペシャル問題";
+                num3 = GenerateSpecial(num1, num2);
             } else {
-              while(true){//解答群重複防止処理(不正解の選択肢は被る)
-                rannum = Math.floor( Math.random() * 10001 );
-                var missel = Math.floor( Math.random() * 8);
-                if(missel == 0 && miss == false && num3 <= 9990){//ミスリード選択肢生成
-                  rannum = num3 + 10;
-                  miss = true;
-                }else if(missel == 1 && miss == false && num3 >= 110){
-                  rannum = num3 - 10;
-                  miss = true;
+                SpecialBonus = 1;
+                document.getElementById("Special").innerHTML = "";
+            }
+
+            for (var i = 0; i <= 3; i++) {
+                if (i == correct) {
+                    select[i] = num3;
+                } else {
+                    while (true) { //解答群重複防止処理(不正解の選択肢は被る)
+                        rannum = Math.floor(Math.random() * 10001);
+                        var missel = Math.floor(Math.random() * 8);
+                        if (missel == 0 && miss == false && num3 <= 9990) { //ミスリード選択肢生成
+                            rannum = num3 + 10;
+                            miss = true;
+                        } else if (missel == 1 && miss == false && num3 >= 110) {
+                            rannum = num3 - 10;
+                            miss = true;
+                        }
+                        if (rannum != num3) {
+                            break;
+                        }
+                    }
+
+                    select[i] = rannum;
                 }
-                if(rannum != num3){
-                  break;
+
+
+            }
+
+
+            select1.innerHTML = select[0];
+            select2.innerHTML = select[1];
+            select3.innerHTML = select[2];
+            select4.innerHTML = select[3];
+
+            StartTimer();
+            return correct;
+        }
+
+        function GenerateSpecial(N1, N2) {
+            var Special = [ //この実装はあまりよくない気がする、せめてグローバルにすべきだったか？
+                {
+                    "ID": 0,
+                    "Question": "存在しません",
+                    "Ans": 0
+                }, //ID:0は参照しません
+                {
+                    "ID": 1,
+                    "Question": "1 × 2 × 3 × 4 × 5 = ",
+                    "Ans": 120
+                }, {
+                    "ID": 2,
+                    "Question": "2を10回かけると？<br />A. ",
+                    "Ans": 1024
+                }, {
+                    "ID": 3,
+                    "Question": "4 + 5 × 6 = ",
+                    "Ans": 34
+                }, {
+                    "ID": 4,
+                    "Question": "生命、宇宙、そして万物についての究極の疑問の答え = ",
+                    "Ans": 42
+                }, {
+                    "ID": 5,
+                    "Question": "たかし君は時速" + N1 + "kmで" + N2 + "時間進みました。何km進みましたか？<br />A. ",
+                    "Ans": N1 * N2
+                }, {
+                    "ID": 6,
+                    "Question": "たかし君は駄菓子屋で" + N1 + "円のお菓子を" + N2 + "個買いました。いくらになりますか？<br />A. ",
+                    "Ans": N1 * N2
+                }, {
+                    "ID": 7,
+                    "Question": (N1 + N2) + " + " + N1 + " × " + N2 + " = ",
+                    "Ans": (N1 + N2) + N1 * N2
                 }
-              }
-              
-              select[i] = rannum;
+            ];
+
+            var id = Math.floor(Math.random() * 7) + 1;
+            // id = 7//デバッグ
+
+            formula.innerHTML = Special[id].Question;
+            return Special[id].Ans;
+        }
+
+        function judge(id) {
+            var BtnValu = document.getElementById(id);
+            var formula = document.getElementById("formula");
+
+            formula.innerHTML = formula.innerHTML + BtnValu.innerHTML;
+
+            Scoring(id);
+        }
+
+        function Scoring(i) {
+            var formula = document.getElementById("formula");
+            // const SelectSE = new Media("a.mp3");
+            // SelectSE.play();
+            //SEなぜ動かない
+
+            if (i == CorrectSel) {
+                formula.innerHTML = formula.innerHTML + "<span style=\"color:#ff0000;\">　正解！</span>";
+                CorrectNum = CorrectNum + 1;
+                TimeBonus = TimeBonus + document.getElementById("TimePrg").value * SpecialBonus;
+                console.log(document.getElementById("TimePrg").value * SpecialBonus);
+                document.getElementById("correctnum").innerHTML = CorrectNum;
+                // playSound();
+                // document.getElementById("ok").play();
+                if(!audios["ok"].ended) audios["ok"].currentTime = 0;
+                audios["ok"].play();
+            } else {
+                formula.innerHTML = formula.innerHTML + "<span style=\"color:#0000ff;\">　不正解</span>";
+                if (localStorage.getItem("VibSetting") == "true") {
+                    navigator.vibrate(500);
+                }
+                // document.getElementById("no").play();
+                if(!audios["no"].ended) audios["no"].currentTime = 0;
+                audios["no"].play();
+                WrongNum = WrongNum + 1;
             }
-              
-              
-          }
-      
-
-          select1.innerHTML = select[0];
-          select2.innerHTML = select[1];
-          select3.innerHTML = select[2];
-          select4.innerHTML = select[3];
-          
-          StartTimer();
-          return correct;
+            BtnDisable(true);
         }
 
-        function GenerateSpecial(N1,N2){
-          var Special = [//この実装はあまりよくない気がする、せめてグローバルにすべきだったか？
-            {"ID":0,"Question":"存在しません","Ans":0},//ID:0は参照しません
-            {"ID":1,"Question":"1 × 2 × 3 × 4 × 5 = ","Ans":120},
-            {"ID":2,"Question":"2を10回かけると？<br />A. ","Ans":1024},
-            {"ID":3,"Question":"4 + 5 × 6 = ","Ans":34},
-            {"ID":4,"Question":"生命、宇宙、そして万物についての究極の疑問の答え = ","Ans":42},
-            {"ID":5,"Question":"たかし君は時速"+N1+"kmで"+N2+"時間進みました。何km進みましたか？<br />A. ","Ans":N1*N2},
-            {"ID":6,"Question":"たかし君は駄菓子屋で"+N1+"円のお菓子を"+N2+"個買いました。いくらになりますか？<br />A. ","Ans":N1*N2},
-            {"ID":7,"Question":(N1+N2)+" + "+N1+" × "+N2+" = ","Ans":(N1+N2)+N1*N2}
-          ];
-
-          var id = Math.floor( Math.random() * 7) + 1;
-          // id = 7//デバッグ
-
-          formula.innerHTML = Special[id].Question;
-          return Special[id].Ans;
+        function reset() {
+            BtnDisable(false);
+            CorrectSel = GenerateMultipl()
+            document.getElementById("TimePrg").value = 100;
         }
 
-        function judge(id){
-          var BtnValu = document.getElementById(id);
-          var formula = document.getElementById("formula");
-
-          formula.innerHTML = formula.innerHTML + BtnValu.innerHTML;
-          
-          Scoring(id);
-        }
-        
-        function Scoring(i){
-          var formula = document.getElementById("formula");
-          // const SelectSE = new Media("a.mp3");
-          // SelectSE.play();
-          //SEなぜ動かない
-
-          if( i == CorrectSel ){
-            formula.innerHTML = formula.innerHTML + "<span style=\"color:#ff0000;\">　正解！</span>";
-            CorrectNum = CorrectNum + 1;
-            TimeBonus = TimeBonus + document.getElementById("TimePrg").value * SpecialBonus;
-            console.log(document.getElementById("TimePrg").value * SpecialBonus);
-            document.getElementById("correctnum").innerHTML = CorrectNum;
-          }else{
-            formula.innerHTML = formula.innerHTML + "<span style=\"color:#0000ff;\">　不正解</span>";
-            if(localStorage.getItem("VibSetting") == "true"){
-              navigator.vibrate(500);
+        function BtnDisable(bool) {
+            document.getElementById("0").disabled = bool;
+            document.getElementById("1").disabled = bool;
+            document.getElementById("2").disabled = bool;
+            document.getElementById("3").disabled = bool;
+            clearInterval(timer);
+            if (bool == true) {
+                if (WrongNum > 0 && GameMode == "true") {
+                    localStorage.setItem("Result_CorrectNum", CorrectNum);
+                    localStorage.setItem("Result_WrongNum", WrongNum);
+                    localStorage.setItem("Result_TimeBonus", TimeBonus);
+                    document.getElementById("next").innerHTML = "<a href=\"result.html\"><ons-button>次へ</ons-button></a>";
+                } else {
+                    document.getElementById("next").innerHTML = "<ons-button onclick=\"reset()\">次へ</ons-button>";
+                }
+            } else {
+                document.getElementById("next").innerHTML = "";
             }
-            WrongNum = WrongNum + 1;
-          }
-          BtnDisable(true);
         }
 
-        function reset(){
-          BtnDisable(false);
-          CorrectSel = GenerateMultipl()
-          document.getElementById("TimePrg").value = 100;
-        }
 
-        function BtnDisable(bool){
-          document.getElementById("0").disabled = bool;
-          document.getElementById("1").disabled = bool;
-          document.getElementById("2").disabled = bool;
-          document.getElementById("3").disabled = bool;
-          clearInterval(timer);
-          if(bool == true){
-            if(WrongNum > 0 && GameMode == "true"){
-              localStorage.setItem("Result_CorrectNum",CorrectNum);
-              localStorage.setItem("Result_WrongNum",WrongNum);
-              localStorage.setItem("Result_TimeBonus",TimeBonus);
-              document.getElementById("next").innerHTML = "<a href=\"result.html\"><ons-button>次へ</ons-button></a>";
-            }else{
-              document.getElementById("next").innerHTML = "<ons-button onclick=\"reset()\">次へ</ons-button>";
-            }
-          }else{
-            document.getElementById("next").innerHTML = "";
-          }
-        }
+        function StartTimer() {
+            timer = setInterval(function decTime() {
+                var nowTime = document.getElementById("TimePrg").value;
+                nowTime = nowTime - 1;
 
-        
-        function StartTimer(){
-          timer = setInterval(function decTime(){
-            var nowTime = document.getElementById("TimePrg").value;
-            nowTime = nowTime - 1;
-            
-            //console.log(nowTime);
-            document.getElementById("TimePrg").value = nowTime;
-            if(nowTime == 0){
-              clearInterval(timer);
-            }
-          },100);
+                //console.log(nowTime);
+                document.getElementById("TimePrg").value = nowTime;
+                if (nowTime == 0) {
+                    clearInterval(timer);
+                }
+            }, 100);
         }
         //初回関数実行----
 
         createAlertDialog();
 
-        
+
         //-------
     </script>
+    <script>
+        var media = null;
+        var mediaTimer = null;
+        var srcFile = getPath() + "C.mp3";
+
+
+        document.addEventListener("deviceready", onDeviceReady, false);
+
+        function onDeviceReady() {
+            console.log("cordova is ready");
+            media = new Media(srcFile, onSuccess, onError);
+        }
+
+        function getPath() {
+            var str = location.pathname;
+            var i = str.lastIndexOf('/');
+            return str.substring(0, i + 1);
+        }
+
+        function playSound() {
+            // play the media file one time.
+            console.log(media);
+            console.log("st:" + media.mediaStatus);
+            // media.seekTo(0);
+            media.play({
+                numberOfLoops: 1
+            });
+            // start the timer
+            // if (mediaTimer == null) {
+            //     mediaTimer = setInterval(function() {
+            //         // Return a current playback position
+            //         media.getCurrentPosition(
+            //             //A Callback function if it's success
+            //             function(position) {
+            //                 if (position > -1) {
+            //                     //If the playback stops at "-0.001" position, set the timer to 0.
+            //                     if(position == -0.001){
+            //                         position = 0;
+            //                     }
+            //                     setAudioPosition((position) + " sec");
+            //                 }
+            //             },
+            //             //A callback function in case of failure
+            //             function(error) {
+            //                 console.log("Error getting pos=" + error);
+            //                 setAudioPosition("Error: " + error);
+            //             }
+            //         );
+            //     }, 1000);
+            // }
+        }
+
+        function pauseSound() {
+            if (media) {
+                media.pause();
+            }
+        }
+
+        function stopSound() {
+            if (media) {
+                media.stop();
+            }
+        }
+
+        function setAudioPosition(position) {
+            // document.getElementById('audio_position').innerHTML = position;
+        }
+
+        function onSuccess() {
+            console.log("Successfully initialize a media file.");
+        }
+
+        function onError(error) {
+            console.log("Failed to initialize a media file. [ Error code: " + error.code + ", Error message: " + error.message + "]");
+        }
+    </script>
 </body>
+
 </html>

@@ -5,7 +5,7 @@
         "cordova-plugin-splashscreen": "6.0.0",
         "monaca-plugin-monaca-core": "3.3.1",
         "cordova-plugin-vibration": "3.1.1",
-        "cordova-plugin-media": "6.0.0"
+        "cordova-plugin-media": "5.0.4"
     },
     "cordova": {
         "plugins": {
