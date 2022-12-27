@@ -1,7 +1,10 @@
 /**/
 
+@import url('https://fonts.googleapis.com/css2?family=Klee+One:wght@600&display=swap');
+
+
 body{
-  font-family: "ヒラギノ角ゴシック",sans-serif;
+  font-family: 'Klee One',"ヒラギノ角ゴシック",sans-serif;
   background-color: #efefef;
   background-image: url("../image/back.png");
   /*background-repeat: ;*/
@@ -134,6 +137,10 @@ p#info{
 div#Twitter{
   margin-top: 10%;
   float: center;
+}
+
+.font {
+  font-family: 'Klee One', cursive;
 }
 
 /* ここから下はアニメーション関連 */
