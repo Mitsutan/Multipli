@@ -3,8 +3,10 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-    <meta http-equiv="Content-Security-Policy" content="default-src * data: gap: https://ssl.gstatic.com; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'">
+    <meta name="viewport"
+        content="width=device-width, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src * data: gap: https://ssl.gstatic.com; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'">
     <script src="components/loader.js"></script>
     <script src="lib/onsenui/js/onsenui.min.js"></script>
 
@@ -14,7 +16,7 @@
     <link rel="stylesheet" href="css/style.css">
 
     <script>
-        ons.ready(function() {
+        ons.ready(function () {
             console.log("game Onsen UI is ready!");
         });
 
@@ -26,35 +28,35 @@
             "ok": new Audio("ok.mp3"),
             "no": new Audio("no.mp3")
         };
-        window.addEventListener('load', function() {
+        window.addEventListener('load', function () {
             for (let i in audios) {
                 audios[i].load();
-                if(localStorage.getItem("SeSetting") == "false") audios[i].muted = true;
+                if (localStorage.getItem("SeSetting") == "false") audios[i].muted = true;
                 console.log(audios[i].muted);
             }
         });
     </script>
 
     <template id="alert-dialog.html">
-      <ons-alert-dialog id="my-alert-dialog" modifier="rowfooter">
-        <div class="alert-dialog-title">準備はいい？</div>
-        <div class="alert-dialog-content">
-          <span id="mode">練習モード</span>
-          <script>
-            //alert(localStorage.getItem("ModeSetting"));
-            var GameMode = localStorage.getItem("ModeSetting");
-            if(GameMode == "true"){
-              document.getElementById("mode").innerHTML = "本番モード";
-            }else{
-              document.getElementById("back").innerHTML = "<a href=\"index.html\"><ons-button id=\"backBtn\">終了</ons-button></a>";
-            }
-          </script>
-        </div>
-        <div>
-          <!--<ons-alert-dialog-button onclick="hideAlertDialog()">Cancel</ons-alert-dialog-button>-->
-          <ons-alert-dialog-button onclick="hideAlertDialog()">GO!</ons-alert-dialog-button>
-        </div>
-      </ons-alert-dialog>
+        <ons-alert-dialog id="my-alert-dialog" modifier="rowfooter">
+            <div class="alert-dialog-title">準備はいい？</div>
+            <div class="alert-dialog-content">
+                <span id="mode">練習モード</span>
+                <script>
+                    //alert(localStorage.getItem("ModeSetting"));
+                    var GameMode = localStorage.getItem("ModeSetting");
+                    if (GameMode == "true") {
+                        document.getElementById("mode").innerHTML = "本番モード";
+                    } else {
+                        document.getElementById("back").innerHTML = "<a href=\"index.html\"><ons-button id=\"backBtn\">終了</ons-button></a>";
+                    }
+                </script>
+            </div>
+            <div>
+                <!--<ons-alert-dialog-button onclick="hideAlertDialog()">Cancel</ons-alert-dialog-button>-->
+                <ons-alert-dialog-button onclick="hideAlertDialog()">GO!</ons-alert-dialog-button>
+            </div>
+        </ons-alert-dialog>
     </template>
 </head>
 
@@ -65,6 +67,7 @@
                 <div id="formula">　</div>
             </div>
             <div class="content font">
+                <p id="point" class="" hidden>aaaa</p>
                 <p>正解数：<span id="correctnum">0</span><span id="Special"></span></p>
                 <ons-progress-bar id="TimePrg" value="100"></ons-progress-bar>
             </div>
@@ -90,23 +93,23 @@
 
 
         //onsenUIのやつ----
-        var hideAlertDialog = function() {
+        var hideAlertDialog = function () {
             document.getElementById('my-alert-dialog').hide();
             CorrectSel = GenerateMultipl();
             //StartTimer();
             //console.log(CorrectSel);
         };
 
-        var createAlertDialog = function() {
+        var createAlertDialog = function () {
             var dialog = document.getElementById('my-alert-dialog');
 
             if (dialog) {
                 dialog.show();
             } else {
                 ons.createElement('alert-dialog.html', {
-                        append: true
-                    })
-                    .then(function(dialog) {
+                    append: true
+                })
+                    .then(function (dialog) {
                         dialog.show();
                     });
             }
@@ -245,18 +248,21 @@
                 formula.innerHTML = formula.innerHTML + "<span style=\"color:#ff0000;\">　正解！</span>";
                 CorrectNum = CorrectNum + 1;
                 const point = document.getElementById("TimePrg").value * SpecialBonus;
+                document.getElementById("point").hidden = false;
+                document.getElementById("point").setAttribute("class", "anime5 delay0");
+                document.getElementById("point").innerHTML = point + "Pt+";
                 TimeBonus = TimeBonus + point;
                 console.log(point);
                 document.getElementById("correctnum").innerHTML = CorrectNum;
                 // playSound();
-                if(!audios["ok"].ended) audios["ok"].currentTime = 0;
+                if (!audios["ok"].ended) audios["ok"].currentTime = 0;
                 audios["ok"].play();
             } else {
                 formula.innerHTML = formula.innerHTML + "<span style=\"color:#0000ff;\">　不正解</span>";
                 if (localStorage.getItem("VibSetting") == "true") {
                     navigator.vibrate(500);
                 }
-                if(!audios["no"].ended) audios["no"].currentTime = 0;
+                if (!audios["no"].ended) audios["no"].currentTime = 0;
                 audios["no"].play();
                 WrongNum = WrongNum + 1;
             }
@@ -267,6 +273,8 @@
             BtnDisable(false);
             CorrectSel = GenerateMultipl()
             document.getElementById("TimePrg").value = 100;
+            document.getElementById("point").hidden = true;
+            document.getElementById("point").setAttribute("class", "");
         }
 
         function BtnDisable(bool) {

@@ -34,6 +34,12 @@ div.def {
   margin-top: 10%;
 }
 
+p#point {
+  font-size: small;
+  position: absolute;
+  right: 40px;
+}
+
 ons-button.TopButton {
   margin-top: 10%;
 }
@@ -172,6 +178,14 @@ div#Twitter {
   animation-duration: 0.3s;
   animation-timing-function: ease-out;
   transform: scale(0);
+}
+
+.anime5 {
+  animation-name: fade_up;
+  animation-fill-mode: forwards;
+  animation-duration: 0.3s;
+  animation-timing-function: ease-out;
+  opacity: 0;
 }
 
 /* 遅延設定 */
