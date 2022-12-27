@@ -59,8 +59,6 @@
 </head>
 
 <body>
-    <!-- <audio src="ok.mp3" id="ok"></audio> -->
-    <!-- <audio src="no.mp3" id="no"></audio> -->
     <div class="def">
         <ons-card>
             <div class="title">
@@ -184,7 +182,7 @@
         }
 
         function GenerateSpecial(N1, N2) {
-            var Special = [ //この実装はあまりよくない気がする、せめてグローバルにすべきだったか？
+            var Special = [ //この実装はあまりよくない気がする
                 {
                     "ID": 0,
                     "Question": "存在しません",
@@ -246,11 +244,11 @@
             if (i == CorrectSel) {
                 formula.innerHTML = formula.innerHTML + "<span style=\"color:#ff0000;\">　正解！</span>";
                 CorrectNum = CorrectNum + 1;
-                TimeBonus = TimeBonus + document.getElementById("TimePrg").value * SpecialBonus;
-                console.log(document.getElementById("TimePrg").value * SpecialBonus);
+                const point = document.getElementById("TimePrg").value * SpecialBonus;
+                TimeBonus = TimeBonus + point;
+                console.log(point);
                 document.getElementById("correctnum").innerHTML = CorrectNum;
                 // playSound();
-                // document.getElementById("ok").play();
                 if(!audios["ok"].ended) audios["ok"].currentTime = 0;
                 audios["ok"].play();
             } else {
@@ -258,7 +256,6 @@
                 if (localStorage.getItem("VibSetting") == "true") {
                     navigator.vibrate(500);
                 }
-                // document.getElementById("no").play();
                 if(!audios["no"].ended) audios["no"].currentTime = 0;
                 audios["no"].play();
                 WrongNum = WrongNum + 1;
